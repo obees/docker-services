@@ -43,7 +43,7 @@ docker run -u root -ti ches/kafka bash
 # Dans l'interface de nifi http://192.168.99.100:8080/nifi
 
 # 1 : Créer une api rest sur le port 8081
-# 2 : Pousser les messages vers le topic topic de kafka:9092
+# 2 : Pousser les messages vers le topic topic de kafka:9092 version 10
 
 
 # ####################################### #
