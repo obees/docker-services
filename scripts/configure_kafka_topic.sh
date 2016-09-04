@@ -29,10 +29,21 @@ docker run -u root -ti ches/kafka bash
 	bin/kafka-topics.sh --describe --zookeeper zk:2181 --topic topic
 
 	# Lancer un producteur de data kafka
-	bin/kafka-console-producer.sh --topic topic2 --broker-list "kafka:9092"
+	bin/kafka-console-producer.sh --topic topic --broker-list "kafka:9092"
 
 	# Lancer un consommateur de data kafka
-	bin/kafka-console-consumer.sh --topic topic2 --from-beginning --zookeeper "zk:2181"
+	bin/kafka-console-consumer.sh --topic topic --from-beginning --zookeeper "zk:2181"
+
+
+# ####################################### #
+# call rest api url with curl             #
+# ####################################### #
+
+# Configuration de nifi
+# Dans l'interface de nifi http://192.168.99.100:8080/nifi
+
+# 1 : Créer une api rest sur le port 8081
+# 2 : Pousser les messages vers le topic topic de kafka:9092
 
 
 # ####################################### #
