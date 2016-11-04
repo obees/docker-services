@@ -110,3 +110,40 @@ docker-machine ssh manager1 docker run --rm ches/kafka kafka-topics.sh --describ
 docker-machine ssh manager1 docker run --rm ches/kafka kafka-topics.sh --describe --zookeeper 192.168.99.100:2181 --topic topic
 
 docker-machine ssh manager1 docker service create --name kafkaadm --env ZOOKEEPER_IP=192.168.99.100 --network kafkanet ches/kafka
+curl -i -X POST -H 'Content-Type: application/json' -d '{"nom":"data is here"}' http://192.168.99.100:8081/contentListener
+
+# Tests cluster nifi
+
+# docker run -i -t --rm -p 8443:443 -v ${cert_path}:/opt/certs -v $(readlink -f ./authorized-users.xml):/opt/nifi/conf/authorized-users.xml -e KEYSTORE_PATH=/opt/certs/keystore.jks -e KEYSTORE_TYPE=JKS -e KEYSTORE_PASSWORD=password -e TRUSTSTORE_PATH=/opt/certs/truststore.jks -e TRUSTSTORE_PASSWORD=password -e TRUSTSTORE_TYPE=JKS apiri/apache-nifi
+# docker run -i -t --rm -p 8080:80 -e DISABLE_SSL=true aldrin/apache-nifi
+
+# Il faut travailler sur la config cluster dans un projet à part
+
+# Config minimum d'un cluster nifi 
+
+# nifi.properties 
+nifi.web.http.host= 												# nifi1, nifi2, ... à passer en variable d'environnement
+nifi.web.http.port=80 												# à passer --env
+nifi.cluster.is.node=true 											# Mettre à true si cluster
+nifi.cluster.node.address=											# Set this to the fully qualified hostname of the node. If left blank, it defaults to "localhost".
+nifi.cluster.node.protocol.port= 									# Set this to an open port that is higher than 1024 (anything lower requires root).
+nifi.cluster.node.protocol.threads=									# The number of threads that should be used to communicate with other nodes in the cluster. This property defaults to 10, but for large clusters, this value may need to be larger.
+nifi.zookeeper.connect.string=zoo1:2181,zoo2:2181,zoo3:2181			# The Connect String that is needed to connect to Apache ZooKeeper. This is a comma-separted list of hostname:port pairs. For example, localhost:2181,localhost:2182,localhost:2183. This should contain a list of all ZooKeeper instances in the ZooKeeper quorum.
+nifi.zookeeper.root.node=											# à passer -env # /nifi/nifi1 ou /nifi/nifi2
+
+# state-management.xml
+<property name="Connect String">zoo1:2181,zoo2:2181,zoo3:2181</property> # à passer --env # myhost.mydomain:2181,host2.mydomain:5555,host3:6666
+<property name="Root Node">/nifi</property> # à passer -env # /nifi/nifi1 ou /nifi/nifi2
+
+NIFI_WEB_HTTP_HOST=nifi1
+NIFI_WEB_HTTP_PORT=80
+NIFI_CLUSTER_IS_NODE=true
+NIFI_CLUSTER_NODE_ADDRESS=nifi1
+NIFI_CLUSTER_NODE_PROTOCOL_PORT=2190 
+NIFI_CLUSTER_NODE_PROTOCOL_THREADS=10 
+NIFI_ZOOKEEPER_CONNECT_STRING='zoo1:2181,zoo2:2181,zoo3:2181' 
+NIFI_ZOOKEEPER_ROOT_NODE=/nifi
+
+env NIFI_WEB_HTTP_HOST=nifi1 NIFI_WEB_HTTP_PORT=80 NIFI_CLUSTER_IS_NODE=true NIFI_CLUSTER_NODE_ADDRESS=nifi1 NIFI_CLUSTER_NODE_PROTOCOL_PORT=2190 NIFI_CLUSTER_NODE_PROTOCOL_THREADS=10 NIFI_ZOOKEEPER_CONNECT_STRING='zoo1:2181,zoo2:2181,zoo3:2181' NIFI_ZOOKEEPER_ROOT_NODE='\/nifi' ./test.sh
+
+env NIFI_WEB_HTTP_HOST=nifi1 NIFI_WEB_HTTP_PORT=80 NIFI_CLUSTER_IS_NODE=true ./test.sh
