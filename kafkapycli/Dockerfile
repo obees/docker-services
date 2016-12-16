@@ -22,7 +22,7 @@ RUN echo "gpgcheck=1" | tee --append /etc/yum.repos.d/confluent.repo
 RUN echo "gpgkey=http://packages.confluent.io/rpm/3.1/archive.key" | tee --append /etc/yum.repos.d/confluent.repo
 RUN echo "enabled=1" | tee --append /etc/yum.repos.d/confluent.repo
 
-RUN yum install -y librdkafka-devel
+RUN yum install -y librdkafka-devel openssl-devel libffi-devel
 
 # install pip
 RUN curl "https://bootstrap.pypa.io/get-pip.py" -o "get-pip.py"
